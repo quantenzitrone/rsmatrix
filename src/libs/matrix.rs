@@ -10,7 +10,7 @@ use termion::{
 
 use crate::arguments::Settings;
 
-use super::{datastring::DataString, charset::CharWidth};
+use super::{charset::CharWidth, datastring::DataString};
 use super::{charset::Charset, drawable::Drawable};
 
 // change queue를 만들어서 cursor로 움직여서...
@@ -23,11 +23,10 @@ pub struct Matrix<'a> {
 }
 
 impl Matrix<'_> {
-
     pub fn new(width: u16, height: u16, settings: &Settings) -> Matrix {
         let datastring_count = match settings.charset.get_width() {
-          CharWidth::Half => width + 1,
-          CharWidth::Full => width / u16::from(settings.charset.get_width()),
+            CharWidth::Half => width + 1,
+            CharWidth::Full => width / u16::from(settings.charset.get_width()),
         };
 
         Matrix {

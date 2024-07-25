@@ -23,7 +23,6 @@ struct Datum {
 }
 
 impl Datum {
-    
     fn get_bold(&self, is_head: bool) -> String {
         let bold;
         if is_head {
@@ -36,7 +35,7 @@ impl Datum {
             false => style::NoBold.to_string(),
         }
     }
-    
+
     fn get_color(&self, is_head: bool) -> String {
         if is_head {
             self.head.fg_string()
@@ -46,7 +45,6 @@ impl Datum {
     }
 
     fn draw<W: Write>(&self, stdout: &mut W, is_head: bool) {
-
         write!(
             stdout,
             "{}{}{}{}",
@@ -56,7 +54,6 @@ impl Datum {
             style::Reset.to_string()
         );
     }
-    
 }
 
 #[derive(Clone)]
@@ -122,14 +119,25 @@ impl DataString<'_> {
         if 1 <= self.y_head && self.y_head <= self.matrix_height + 1 {
             // head
             if self.y_head <= self.matrix_height {
-                stdout.write(cursor::Goto( self.x * u16::from(self.settings.charset.get_width()), self.y_head).to_string().as_bytes());
+                stdout.write(
+                    cursor::Goto(
+                        self.x * u16::from(self.settings.charset.get_width()),
+                        self.y_head,
+                    )
+                    .to_string()
+                    .as_bytes(),
+                );
                 self.data[(self.y_head - 1) as usize].draw(stdout, true);
             }
 
             // tail
             let neck = self.y_head - 1;
             if 1 <= neck {
-                stdout.write( cursor::Goto(self.x * u16::from(self.settings.charset.get_width()), neck).to_string().as_bytes());
+                stdout.write(
+                    cursor::Goto(self.x * u16::from(self.settings.charset.get_width()), neck)
+                        .to_string()
+                        .as_bytes(),
+                );
                 self.data[(neck - 1) as usize].draw(stdout, false);
             }
         }

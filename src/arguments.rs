@@ -2,10 +2,10 @@ use crate::libs::{
     charset::{self, Charset},
     utils::get_random_number,
 };
-use std::{cell::RefCell, cmp::Ord};
 use clap::Parser;
 use rand::Rng;
 use std::ops::Range;
+use std::{cell::RefCell, cmp::Ord};
 use termion::color;
 
 const RAINBOW: [color::Rgb; 7] = [
@@ -113,7 +113,7 @@ struct Arguments {
     pub frames: u16,
 
     /// Set brightness effect for tail
-    /// 
+    ///
     /// OPTIONS:
     ///     none,
     ///     random,
@@ -123,10 +123,11 @@ struct Arguments {
 }
 
 pub fn parse_cli_arguments() -> Settings {
-
     let arguments: Arguments = Arguments::parse();
     // curryied color func
-    let get_tail_color = Box::new(move || get_color_from_string(arguments.tail.as_str(), arguments.brightness.as_str()));
+    let get_tail_color = Box::new(move || {
+        get_color_from_string(arguments.tail.as_str(), arguments.brightness.as_str())
+    });
     let get_head_color = Box::new(move || get_color_from_string(arguments.head.as_str(), "none"));
 
     let charset = match arguments.charset.as_str() {
@@ -178,29 +179,25 @@ fn get_color_from_string(color: &str, brightness: &str) -> color::Rgb {
 }
 
 fn get_lower_brightness(color: color::Rgb, factor: u8) -> color::Rgb {
-    let color::Rgb(r,g,b) = color;
+    let color::Rgb(r, g, b) = color;
     let factor = factor + 1;
     let r = (r / factor).clamp(0, 255) as u8;
     let g = (g / factor).clamp(0, 255) as u8;
     let b = (b / factor).clamp(0, 255) as u8;
-    color::Rgb(r,g,b)
+    color::Rgb(r, g, b)
 }
 
 fn apply_brightness(color: color::Rgb, brightness: &str) -> color::Rgb {
     match brightness {
         "none" => color,
-        "random" => {
-            get_lower_brightness(color, get_random_number(0..5) as u8)
-        },
-        "gradient" => {
-            GLOBAL_ITER_IDX.with(|idx| {
-                let i = *idx.borrow();
-                let factor = if i > 10 { 20 - i } else {i};
-                let ret = get_lower_brightness(color, factor as u8);
-                *idx.borrow_mut() = (i+1)%20;
-                ret 
-            })
-        },
+        "random" => get_lower_brightness(color, get_random_number(0..5) as u8),
+        "gradient" => GLOBAL_ITER_IDX.with(|idx| {
+            let i = *idx.borrow();
+            let factor = if i > 10 { 20 - i } else { i };
+            let ret = get_lower_brightness(color, factor as u8);
+            *idx.borrow_mut() = (i + 1) % 20;
+            ret
+        }),
         _ => color,
     }
 }
