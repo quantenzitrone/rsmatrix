@@ -13,7 +13,8 @@ use std::{
     time::{Duration, Instant},
 };
 use termion::{
-    clear, color, cursor, event::Key, input::TermRead, raw::IntoRawMode, style, terminal_size,
+    clear, color, cursor, event::Key, input::TermRead, raw::IntoRawMode, screen, style,
+    terminal_size,
 };
 
 use arguments::parse_cli_arguments;
@@ -45,7 +46,13 @@ fn main() {
     let frames_per_second: u16 = settings.frames;
     let mili_per_frame: u16 = 1000 / frames_per_second;
     let mut frame_count: u16 = 0;
-    write!(stdout, "{}{}", cursor::Hide, clear::All);
+    write!(
+        stdout,
+        "{}{}{}",
+        screen::ToAlternateScreen,
+        cursor::Hide,
+        clear::All
+    );
     loop {
         let now = Instant::now();
         // user input while running
@@ -78,6 +85,8 @@ fn main() {
             None => {}
         };
     }
+
+    write!(stdout, "{}{}", screen::ToMainScreen, cursor::Show);
 
     // stderr.flush().unwrap();
 }
